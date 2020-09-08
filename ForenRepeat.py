@@ -19,6 +19,7 @@ import pandas as pd
 
 ## local pack
 from ForenRepeatLib import myBasicCount
+from ForenRepeatLib import myLocalDPCount
 from ForenRepeatLib import myPatternReader
 from ForenRepeatLib import myplot
 
@@ -79,6 +80,57 @@ def quick(args):
     return
     
 
+######################  LA Local Align
+def la(args):
+    
+    bam_file_path = args.BAM
+    pattern_file_path = args.PAT
+    sample = args.ID
+    
+    ## create dir
+    path1  = 'forenRepeat_output_la/%s' % sample
+    path2  = 'forenRepeat_output_la/%s/figs' % sample
+    pathlib.Path(path2).mkdir(parents=True, exist_ok=True)
+    
+    
+    ## pattern file
+    pattern_dict = myPatternReader.func_read_in_pattern_file(pattern_file_path)
+    
+    
+    result_lst = []
+    for str_name in pattern_dict:
+        chrom   = pattern_dict[str_name][0]
+        start   = int(pattern_dict[str_name][1])
+        end     = int(pattern_dict[str_name][2])
+        pattern = pattern_dict[str_name][3]
+    
+        ## reads
+        read_lst = myLocalDPCount.func_reads_covering_str_locus(chrom, start, end, pattern, bam_file_path)
+        
+        ## copy number list
+        copy_number_lst = myLocalDPCount.func_get_repeat_allele(read_lst, pattern)
+        
+        ## Get genotype
+        genotype, valid_alleles_num, total_cov, infos = myLocalDPCount.func_str_genotyper(copy_number_lst)
+        
+        ## plot hist
+        fig = myplot.func_save_plot(copy_number_lst, str_name, path2)
+        
+        
+        ## output allele
+        if valid_alleles_num < 2:
+            result_lst.append([str_name, chrom, pattern, genotype[1], genotype[0], valid_alleles_num, total_cov, infos])
+        else :
+            result_lst.append([str_name, chrom, pattern, sorted(genotype)[0], sorted(genotype)[1], valid_alleles_num, total_cov, infos])
+
+
+    pd.DataFrame(result_lst, 
+                 columns=["# STR", "CHR", "pattern", 
+                          "allele1", "allele2", "valid_alleles_num", 
+                          "total_cov", "infos"]).to_csv('%s/forenRep.csv' % path1, index=None, na_rep="NA")
+    return
+    
+    
 
 
 if __name__ == '__main__':
@@ -87,7 +139,7 @@ if __name__ == '__main__':
 
 Available commands are:    
     quick    Repeat quantification by quick mode
-    window   Repeat quantification by window scoring
+    la       Repeat quantification by local align
     align    Repeat quantification by alignment scoring
     
     ''')
@@ -101,11 +153,12 @@ Available commands are:
     qucik_parser.add_argument('--ID', help='output file name', default = None)
     qucik_parser.set_defaults(func=quick)
 
-    ## window
-    window_parser = subparsers.add_parser('window', help='Repeat quantification by window scoring. Developing')
+    ## localalign
+    window_parser = subparsers.add_parser('la', help='Repeat quantification by local align')
     window_parser.add_argument('--BAM', help='input1: *.bam file', default = None)
     window_parser.add_argument('--PAT', help='input2: repeat pattern file', default = None)
     window_parser.add_argument('--ID', help='output file name', default = None)
+    window_parser.set_defaults(func=la)
         
     ## align
     align_parser = subparsers.add_parser('align', help='Repeat quantification by align scoring. Developing')

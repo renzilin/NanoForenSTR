@@ -15,7 +15,7 @@ import pysam
 import numpy as np
 import pandas as pd
 
-def func_copy_number_by_regex(read_seq_str, pattern, dist_cutoff=4):
+def func_copy_number_by_regex(read_seq_str, pattern, dist_cutoff=8):
     repeat_intervals = []
     repeat_lst = []
     start_previous = -1
