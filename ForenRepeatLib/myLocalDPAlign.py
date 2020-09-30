@@ -83,7 +83,8 @@ def align(seq1, seq2, ms=10, mms=-5, gs=-5):
     max_score = array[x-1][y-1].score
     
 #     print("Max Score：", max_score)
-#     print(s1)
-#     print(s2)    
+    # print(s1)
+    # print(s2)
+    # print("\n")
     
     return max_score, s1, s2

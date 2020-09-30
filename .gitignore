@@ -1,3 +1,5 @@
 .ipynb_checkpoints/
 *.ipynb
 pre-bulid/*
+__pycache__/*
+ForenRepeatLib/__pycache__/*
