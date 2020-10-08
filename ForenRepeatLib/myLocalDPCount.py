@@ -192,6 +192,9 @@ def func_repeat_interval(intervals_lst, skip_intervals_lst, read_seq, pattern):
 def func_get_repeat_allele(read_lst, pattern):
     copy_number_lst = []
     
+    if read_lst == []:
+        return copy_number_lst
+    
     for read_ind, read_seq in enumerate(read_lst):
         
         intervals_lst, repeat_lst = get_interval(pattern, read_seq)
@@ -212,6 +215,10 @@ def func_get_repeat_allele(read_lst, pattern):
 
 def func_str_genotyper(count_lst, cutoff = .5):
     
+    if count_lst == []:
+        return [0, 0], -1, 0, -1
+
+
     infos = {}
     for i in count_lst:
         if i not in infos:

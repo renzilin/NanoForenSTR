@@ -16,6 +16,10 @@ mpl.rcParams.update({'font.size': 11,
 
 ## plot the histogram of repeat copy number distribution in each locus
 def func_save_plot(count_lst, str_name, OUTDIR):
+    if count_lst == []:
+        return None
+
+
     fig = plt.figure(figsize = (6.2, 4.2))
     plt.hist(count_lst, bins=100)
 

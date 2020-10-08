@@ -116,7 +116,6 @@ def la(args):
         ## plot hist
         fig = myplot.func_save_plot(copy_number_lst, str_name, path2)
         
-        
         ## output allele
         if valid_alleles_num < 2:
             result_lst.append([str_name, chrom, pattern, genotype[1], genotype[0], valid_alleles_num, total_cov, infos])
