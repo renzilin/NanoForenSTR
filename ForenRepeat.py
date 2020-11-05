@@ -98,7 +98,8 @@ def la(args):
     
     
     result_lst = []
-    for str_name in pattern_dict:
+    for str_ind, str_name in enumerate(pattern_dict):
+        print('## The locus %s is under inference {%d/%d}' % (str_name, str_ind + 1, len(pattern_dict)), flush = True)
         chrom   = pattern_dict[str_name][0]
         start   = int(pattern_dict[str_name][1])
         end     = int(pattern_dict[str_name][2])

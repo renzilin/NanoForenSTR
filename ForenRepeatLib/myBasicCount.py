@@ -75,7 +75,7 @@ def func_extract_reads_in_bam(bam_file_path, chrom, start, end, pattern):
     copy_number_lst = []
     for rank, line in enumerate(iters):
         if line.seq == None:
-            print("## the flag of no seq in bam file: %s" % line.flag)
+            # print("## the flag of no seq in bam file: %s" % line.flag)
             continue
         else:
             read_seq = line.seq

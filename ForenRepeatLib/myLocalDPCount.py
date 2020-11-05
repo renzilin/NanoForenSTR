@@ -15,7 +15,7 @@ from ForenRepeatLib import myLocalDPAlign
 
 def func_inference_on_str_locus(chrom, start, end, pattern, bam_file_path):
     samfile = pysam.AlignmentFile(bam_file_path, 'rb')
-    iters   = samfile.fetch(chrom, start, end, until_eof=True)
+    iters   = samfile.fetch(chrom, start, end, until_eof=False)
     copy_number_lst = []
     for rank, line in enumerate(iters):
         if line.seq == None:
@@ -28,6 +28,7 @@ def func_inference_on_str_locus(chrom, start, end, pattern, bam_file_path):
 
             dist = [repeat_intervals[i][0] - repeat_intervals[i-1][1] for i in range(1, len(repeat_intervals))]
             dists.append(dist)
+    return
     
 
 def func_read_in_pattern_file(pattern_file_path):
@@ -45,7 +46,7 @@ def func_reads_covering_str_locus(chrom, start, end, pattern, bam_file_path):
     reads_lst = []
     
     samfile = pysam.AlignmentFile(bam_file_path, 'rb')
-    iters   = samfile.fetch(chrom, start, end, until_eof=True)
+    iters   = samfile.fetch(chrom, start, end, until_eof=False)
     for rank, line in enumerate(iters):
         if line.seq == None:
             print("## the flag with no seq in bam file %s" % line.flag)
@@ -192,7 +193,7 @@ def func_repeat_interval(intervals_lst, skip_intervals_lst, read_seq, pattern):
 def func_get_repeat_allele(read_lst, pattern):
     copy_number_lst = []
     
-    if read_lst == []:
+    if len(read_lst) <= 10:   ## coverage
         return copy_number_lst
     
     for read_ind, read_seq in enumerate(read_lst):
@@ -213,10 +214,20 @@ def func_get_repeat_allele(read_lst, pattern):
         copy_number_lst.append(copy_number)
     return copy_number_lst
 
-def func_str_genotyper(count_lst, cutoff = .5):
+def func_str_genotyper(count_lst, cutoff = .5, coverage = 10):
     
-    if count_lst == []:
+    if len(count_lst) == 0:
         return [0, 0], -1, 0, -1
+    
+    elif len(count_lst) <= coverage and len(count_lst) > 0:
+        infos = {}
+        for i in count_lst:
+            if i not in infos:
+                infos[i] = 1
+            else:
+                infos[i] += 1
+        
+        return [0, 0], -1, 0, str(infos)
 
 
     infos = {}
