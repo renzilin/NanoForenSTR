@@ -1,7 +1,10 @@
 *.ipynb_checkpoints/*
 *.vscide*
-*ONT_data
+.vscide
+.vscide/*
 *.ipynb
 pre-bulid/*
 *__pycache__*
-ForenRepeatLib/__pycache__/*
+
+*.bam
+*.bam.*
