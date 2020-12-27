@@ -10,7 +10,7 @@ import pysam
 
 import math
 
-from ForenRepeatLib import myLocalDPAlign
+from myLibs import myLocalDPAlign
 
 
 def func_inference_on_str_locus(chrom, start, end, pattern, bam_file_path):

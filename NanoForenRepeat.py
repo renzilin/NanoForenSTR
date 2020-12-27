@@ -18,10 +18,12 @@ import pathlib
 import pandas as pd
 
 ## local pack
-from ForenRepeatLib import myBasicCount
-from ForenRepeatLib import myLocalDPCount
-from ForenRepeatLib import myPatternReader
-from ForenRepeatLib import myplot
+# import sys
+# sys.path.insert(0, "myLibs")
+from myLibs import myBasicCount
+from myLibs import myLocalDPCount
+from myLibs import myPatternReader
+# import myplot
 
 ## parameters
 # parser = argparse.ArgumentParser(description='Repeat quantification for reads from forenseq kit. Still working on')
@@ -81,16 +83,16 @@ def quick(args):
     
 
 ######################  LA Local Align
-def la(args):
+def LA(args):
     
     bam_file_path = args.BAM
     pattern_file_path = args.PAT
     sample = args.ID
     
     ## create dir
-    path1  = 'forenRepeat_output_la/%s' % sample
-    path2  = 'forenRepeat_output_la/%s/figs' % sample
-    pathlib.Path(path2).mkdir(parents=True, exist_ok=True)
+    path1  = 'forenRepeat_output_LA/%s' % sample
+    # path2  = 'forenRepeat_output_LA/%s/figs' % sample
+    # pathlib.Path(path2).mkdir(parents=True, exist_ok=True)
     
     
     ## pattern file
@@ -115,7 +117,7 @@ def la(args):
         genotype, valid_alleles_num, total_cov, infos = myLocalDPCount.func_str_genotyper(copy_number_lst)
         
         ## plot hist
-        fig = myplot.func_save_plot(copy_number_lst, str_name, path2)
+        # fig = myplot.func_save_plot(copy_number_lst, str_name, path2)
         
         ## output allele
         if valid_alleles_num < 2:
@@ -139,8 +141,7 @@ if __name__ == '__main__':
 
 Available commands are:    
     quick    Repeat quantification by quick mode
-    la       Repeat quantification by local align
-    align    Repeat quantification by alignment scoring
+    LA       Repeat quantification by local align
     
     ''')
     subparsers = parser.add_subparsers(help='sub-command help')
@@ -154,17 +155,17 @@ Available commands are:
     qucik_parser.set_defaults(func=quick)
 
     ## localalign
-    window_parser = subparsers.add_parser('la', help='Repeat quantification by local align')
+    window_parser = subparsers.add_parser('LA', help='Repeat quantification by local align')
     window_parser.add_argument('--BAM', help='input1: *.bam file', default = None)
     window_parser.add_argument('--PAT', help='input2: repeat pattern file', default = None)
     window_parser.add_argument('--ID', help='output file name', default = None)
-    window_parser.set_defaults(func=la)
+    window_parser.set_defaults(func=LA)
         
-    ## align
-    align_parser = subparsers.add_parser('align', help='Repeat quantification by align scoring. Developing')
-    align_parser.add_argument('--BAM', help='input1: *.bam file', default = None)
-    align_parser.add_argument('--PAT', help='input2: repeat pattern file', default = None)
-    align_parser.add_argument('--ID', help='output file name', default = None)
+    ## TODO: align
+    # align_parser = subparsers.add_parser('align', help='Repeat quantification by align scoring. Developing')
+    # align_parser.add_argument('--BAM', help='input1: *.bam file', default = None)
+    # align_parser.add_argument('--PAT', help='input2: repeat pattern file', default = None)
+    # align_parser.add_argument('--ID', help='output file name', default = None)
 
     ## run
     args = parser.parse_args()
