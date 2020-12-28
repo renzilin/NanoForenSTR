@@ -1,20 +1,20 @@
 # NanoForenSTR
 
-This script is for Forensic STRs genotyping in the manuscript: *Nanopore sequencing of forensic STRs and SNPs using Verogen’s ForenSeq DNA Signature Prep Kit and MinION.* We've tested it on 54 STRs (XX autosomal STRs, xx X-STRs, and xx Y-STRs). In details, XX of XX STRs can be genotyped robustly and correctly in 30 collected samples and 3 standard 2800 M duplicates.
+This is the script for Forensic STRs genotyping in the manuscript: *Nanopore sequencing of forensic STRs and SNPs using Verogen’s ForenSeq DNA Signature Prep Kit and MinION.* We've tested it on 54 STRs (XX autosomal STRs, xx X-STRs, and xx Y-STRs). In details, XX of XX STRs can be genotyped robustly and correctly in 30 collected samples and 3 standard 2800 M duplicates.
 
 
 
 ## Workflow
 
-In our manuscript's workflow, (1) nanopore reads were aligned to the human reference genome (hg19) using Minimap2 and transformed to the `*.bam` file using Samtools; (2) using the `x.py` to genotype STRs with the required `*.bam` file and pattern file that contains 5 columns (STR name, chromosome, start, end, repeat unit). In the folder `x/x`, we provide a pattern file including 54 STRs used in our manuscript.
+In our manuscript's workflow, (1) nanopore reads were aligned to the human reference genome (hg19) using Minimap2 and transformed to the `*.bam` file using Samtools; (2) using the `x.py`, with the required `*.bam` file and pattern file (contains 5 columns (STR name, chromosome, start, end, repeat unit)), to genotype STRs. In the folder `x/x`, we provide a pattern file including 54 STRs used in our manuscript.
 
-In genotype process, NanoForenSTR firstly extract reads from *.bam* file according to the STR coordinate from pattern file. Secondly, the repeat unit in pattern file are searched in each extracted read. Then, the read is divided into several fragments, some of which are composed of repeat units, and some of which are not. As for the fragments which are not composed of repeat units, we use the Smith-Waterman algorithm to align the fragments against a sequence of the same length as the fragment, which is made up of repeat units. If the alignment result shows less than 1 mismatch or 2 gaps in each repeat unit part, this fragment will be determined as a part of repeat region. After SW alignment process, the repeat region are determined and the copy number of repeat unit in this region can be counted. Finally, we make a summary of copy number from reads. The first allele is the copy number with the largest number of supporting reads. The second allele is the copy number whose number of supporting reads is at least 50% of that of the first allele. Otherwise, this is a homozygous allele. 
+NanoForenSTR firstly extracts reads from *.bam* file according to the STR coordinate from pattern file in the genotyping process. Secondly, the repeat units in the pattern file are searched in each extracted read. Then, the read is divided into several fragments, some of which are composed to repeat units. For the rest fragments that are not composed to repeat units, we use the Smith-Waterman (SW) algorithm to align the fragments against a sequence made up of repeat units and has the same length as the fragment. If the alignment result shows less than one mismatch or two gaps in each repeat unit part, this fragment will be determined as a part of the repeat region. After SW alignment process, the repeat regions are determined, and the copy number of repeat units in this region can be counted. Finally, we make a summary of the copy number from reads. The first allele is the copy number with the largest number of supporting reads. The second allele is the copy number whose number of supporting reads is over 50% of the first allele. Otherwise, this is a homozygous allele. 
 
 
 
 ## Installation
 
-We recommend you to use  `conda` to build NanoForenSTR environment and run our script under it. 
+We recommend to use  `conda` to build NanoForenSTR environment and run our script under it. 
 
 1.  Build the environment:
 
@@ -54,7 +54,7 @@ python setup_myPairwiseAlignment.py  build_ext --inplace
 
 ## Usage
 
-In our manuscript, we use the option `LA`, which is also recommended, to genotype the Forensic STRs. There are 2 options for genotyping STRs. The first one is quick mode, which is just a test version. The second mode uses SW to handle the mismatch and gap problem 
+In our manuscript, we use the option `LA`, which is also recommended, to genotype the Forensic STRs. There are 2 options for genotyping STRs. The first one is quick mode, which is a test version. The second mode uses SW to handle the mismatch and gap problem 
 
 
 
