@@ -1,18 +1,14 @@
 # NanoForenSTR
 
-This script is for Forensic STRs genotyping in the manuscript: *Nanopore sequencing of forensic STRs and SNPs using Verogen’s ForenSeq DNA Signature Prep Kit and MinION.* We've tested it on 54 STRs (XX autosomal STRs, xx X-STRs, and xx Y-STRs). In details, XX of XX STRs can be genotyped robustly and correctly in 30 collected samples and 2800 M. ()
+This script is for Forensic STRs genotyping in the manuscript: *Nanopore sequencing of forensic STRs and SNPs using Verogen’s ForenSeq DNA Signature Prep Kit and MinION.* We've tested it on 54 STRs (XX autosomal STRs, xx X-STRs, and xx Y-STRs). In details, XX of XX STRs can be genotyped robustly and correctly in 30 collected samples and 3 standard 2800 M duplicates.
 
 
 
 ## Workflow
 
-In our manuscript's workflow, (1) long reads were aligned to the human reference genome (hg19) using Minimap2 and transform to the `*.bam` file using samtools; (2) using the `x.py` to genotype STRs with the required `*.bam` file and pattern file that contains 5 columns (STR name, chromosome, start, end, repeat unit). In the folder `x/x`, we provide a pattern file that used in our manuscript including 54 STRs.
+In our manuscript's workflow, (1) nanopore reads were aligned to the human reference genome (hg19) using Minimap2 and transformed to the `*.bam` file using Samtools; (2) using the `x.py` to genotype STRs with the required `*.bam` file and pattern file that contains 5 columns (STR name, chromosome, start, end, repeat unit). In the folder `x/x`, we provide a pattern file including 54 STRs used in our manuscript.
 
-In genotype process, NanoForenSTR firstly search the repeat unit provided by pattern file in aligned reads. Then, the read is split into several sub-regions which is . For the mismatching sub-regions, NanoForenSTR generates  
-
-we use the Smith-Waterman algorithm to align the sub-region against repeat unit tolerating 1 mismatch or 2 gaps ( This is from our testing ). For the mismatch sub-region, if 
-
-If the mismatching sub-region is aligned, then the 
+In genotype process, NanoForenSTR firstly extract reads from *.bam* file according to the STR coordinate from pattern file. Secondly, the repeat unit in pattern file are searched in each extracted read. Then, the read is divided into several fragments, some of which are composed of repeat units, and some of which are not. As for the fragments which are not composed of repeat units, we use the Smith-Waterman algorithm to align the fragments against a sequence of the same length as the fragment, which is made up of repeat units. If the alignment result shows less than 1 mismatch or 2 gaps in each repeat unit part, this fragment will be determined as a part of repeat region. After SW alignment process, the repeat region are determined and the copy number of repeat unit in this region can be counted. Finally, we make a summary of copy number from reads. The first allele is the copy number with the largest number of supporting reads. The second allele is the copy number whose number of supporting reads is at least 50% of that of the first allele. Otherwise, this is a homozygous allele. 
 
 
 
@@ -58,7 +54,7 @@ python setup_myPairwiseAlignment.py  build_ext --inplace
 
 ## Usage
 
-In our manuscript, we use the option `LA` to  genotype the Forensic STRs. The 
+In our manuscript, we use the option `LA`, which is also recommended, to genotype the Forensic STRs. There are 2 options for genotyping STRs. The first one is quick mode, which is just a test version. The second mode uses SW to handle the mismatch and gap problem 
 
 
 
@@ -67,18 +63,23 @@ In our manuscript, we use the option `LA` to  genotype the Forensic STRs. The
 ### General Usage Options
 
 ```bash
-usage: python ForenRepeat.py <command> [<args>]
+usage: python NanoForenRepeat.py <options> [<args>]
 
 Available options are:    
-    quick    Repeat quantification by quick mode
-    LA       Repeat quantification by local align LA
-       [-h] [--BAM BAM] [--PAT PAT] [--ID ID]
+    quick    Genotyping forensic STR by quick mode
+    LA       Genotyping forensic STR by local align (recommend)
+    
+    
+    
+Genotyping forensic STR
 
-Required arguments:
+positional arguments:
+  {quick,LA}  sub-command help
+    quick     Genotyping forensic STR by quick mode
+    LA        Genotyping forensic STR by local align
+
+optional arguments:
   -h, --help  show this help message and exit
-  --BAM BAM   input1: *.bam file
-  --PAT PAT   input2: repeat pattern file
-  --ID ID     output file name
 
 ```
 

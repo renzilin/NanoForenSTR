@@ -8,3 +8,5 @@ pre-bulid/*
 
 *.bam
 *.bam.*
+*.csv
+*x0*
