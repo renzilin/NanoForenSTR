@@ -1,15 +1,18 @@
 # NanoForenSTR
 
-The script for genotyping Forensic STR loci in *Nanopore sequencing of forensic STRs and SNPs using Verogen’s ForenSeq DNA Signature Prep Kit and MinION.*
+This script is for Forensic STRs genotyping in the manuscript: *Nanopore sequencing of forensic STRs and SNPs using Verogen’s ForenSeq DNA Signature Prep Kit and MinION.* We've tested it on 54 STRs (XX autosomal STRs, xx X-STRs, and xx Y-STRs). In details, XX of XX STRs can be genotyped robustly and correctly in 30 collected samples and 2800 M. ()
 
 
 
-## Features
+## Workflow
 
-1. We genotyped XX autosomal STRs, xx X-STRs, and xx Y-STRs using our script. 
-2. The whole working process can be explained by the figures below.
+In our manuscript's workflow, (1) long reads were aligned to the human reference genome (hg19) using Minimap2 and transform to the `*.bam` file using samtools; (2) using the `x.py` to genotype STRs with the required `*.bam` file and pattern file that contains 5 columns (STR name, chromosome, start, end, repeat unit). In the folder `x/x`, we provide a pattern file that used in our manuscript including 54 STRs.
 
+In genotype process, NanoForenSTR firstly search the repeat unit provided by pattern file in aligned reads. Then, the read is split into several sub-regions which is . For the mismatching sub-regions, NanoForenSTR generates  
 
+we use the Smith-Waterman algorithm to align the sub-region against repeat unit tolerating 1 mismatch or 2 gaps ( This is from our testing ). For the mismatch sub-region, if 
+
+If the mismatching sub-region is aligned, then the 
 
 
 
@@ -55,7 +58,29 @@ python setup_myPairwiseAlignment.py  build_ext --inplace
 
 ## Usage
 
-In our 
+In our manuscript, we use the option `LA` to  genotype the Forensic STRs. The 
+
+
+
+
+
+### General Usage Options
+
+```bash
+usage: python ForenRepeat.py <command> [<args>]
+
+Available options are:    
+    quick    Repeat quantification by quick mode
+    LA       Repeat quantification by local align LA
+       [-h] [--BAM BAM] [--PAT PAT] [--ID ID]
+
+Required arguments:
+  -h, --help  show this help message and exit
+  --BAM BAM   input1: *.bam file
+  --PAT PAT   input2: repeat pattern file
+  --ID ID     output file name
+
+```
 
 
 
