@@ -20,8 +20,8 @@ We recommend to use  `conda` to build NanoForenSTR environment and run our scrip
 
 ```bash
 ## create a conda environment
-conda create -n NFS-v0.1
-conda activate NFS-v0.1
+conda create -n NFS-v0.0.1
+conda activate NFS-v0.0.1
 
 ## install dependent packages
 conda install -c conda-forge -c bioconda  python=3.8 pysam=0.16 numpy=1.19 pandas=1.1.3 cython=0.29
@@ -47,7 +47,7 @@ In our manuscript, we use the option `LA`, which is also recommended, to genotyp
 ### Quick Start
 
  ```bash
-conda activate nanoforenstr
+conda activate NFS-v0.0.1
 
 NanoForenSTR="[PATH_TO_NanoForenSTR]"
 
