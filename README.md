@@ -1,6 +1,6 @@
 # NanoForenSTR v0.0.1
 
-This is the script for Forensic STRs genotyping in the manuscript: *Nanopore sequencing of forensic STRs and SNPs using Verogen’s ForenSeq DNA Signature Prep Kit and MinION.* We've tested it on 54 STRs (27 autosomal STRs, 7 X-STRs, and 20 Y-STRs). In details, XX of XX STRs can be genotyped robustly and correctly in 30 collected samples and 3 standard 2800 M duplicates.
+This is the script for Forensic STRs genotyping in the manuscript: *Nanopore sequencing of forensic STRs and SNPs using Verogen’s ForenSeq DNA Signature Prep Kit and MinION.* We've tested it on 54 STRs (27 autosomal STRs, 7 X-STRs, and 20 Y-STRs). In details, 22 of 54 STRs can be genotyped robustly and correctly in 30 collected samples and 3 standard 2800 M duplicates.
 
 
 
@@ -29,15 +29,13 @@ conda install -c conda-forge -c bioconda  python=3.8 pysam=0.16 numpy=1.19 panda
 
 
 
-2. Download the code from our repo and install 
+2. Download the code from our repo and test
 
 ```bash
 git clone https://github.com/renzilin/NanoForenSTR.git
+cd NanoForenSTR/test
 
-cd NanoForenSTR/myLibs
-python setup_myPairwiseAlignment.py build_ext --inplace
-
-python NanoForenRepeat.py LA -h
+python ../NanoForenRepeat.py LA --BAM bam_file/barcode01.test.bam --PAT pattern_file/STRtest.pat --ID test
 ```
 
 
