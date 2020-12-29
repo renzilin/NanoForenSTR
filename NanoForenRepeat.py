@@ -107,9 +107,10 @@ def LA(args):
         start   = int(pattern_dict[str_name][1])
         end     = int(pattern_dict[str_name][2])
         pattern = pattern_dict[str_name][3]
-    
+
         ## reads
-        read_lst = myLocalDPCount.func_reads_covering_str_locus(chrom, start, end, pattern, bam_file_path)
+        flanking_len = 30
+        read_lst = myLocalDPCount.func_reads_covering_str_locus(chrom, start, end, bam_file_path, flanking_len)
         
         ## copy number list
         copy_number_lst = myLocalDPCount.func_get_repeat_allele(read_lst, pattern)
