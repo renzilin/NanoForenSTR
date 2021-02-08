@@ -90,9 +90,10 @@ def LA(args):
     sample = args.ID
     
     ## create dir
+    pathlib.Path('forenRepeat_output_LA/').mkdir(parents=True, exist_ok=True)
     path1  = 'forenRepeat_output_LA/%s' % sample
-    # path2  = 'forenRepeat_output_LA/%s/figs' % sample
-    # pathlib.Path(path2).mkdir(parents=True, exist_ok=True)
+    path2  = 'forenRepeat_output_LA/%s/figs' % sample
+    pathlib.Path(path2).mkdir(parents=True, exist_ok=True)
     
     
     ## pattern file
@@ -106,9 +107,10 @@ def LA(args):
         start   = int(pattern_dict[str_name][1])
         end     = int(pattern_dict[str_name][2])
         pattern = pattern_dict[str_name][3]
-    
+
         ## reads
-        read_lst = myLocalDPCount.func_reads_covering_str_locus(chrom, start, end, pattern, bam_file_path)
+        flanking_len = 30
+        read_lst = myLocalDPCount.func_reads_covering_str_locus(chrom, start, end, bam_file_path, flanking_len)
         
         ## copy number list
         copy_number_lst = myLocalDPCount.func_get_repeat_allele(read_lst, pattern)
@@ -136,37 +138,31 @@ def LA(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Repeat quantification for reads from forenseq kit. Still working on', 
-                                     usage='''python ForenRepeat.py <command> [<args>]
+    parser = argparse.ArgumentParser(description='Genotyping forensic STR', 
+                                     usage='''python NanoForenRepeat.py <options> [<args>]
 
-Available commands are:    
-    quick    Repeat quantification by quick mode
-    LA       Repeat quantification by local align
+Available options are:    
+    quick    Genotyping forensic STR by quick mode
+    LA       Genotyping forensic STR by local align (recommend)
     
     ''')
     subparsers = parser.add_subparsers(help='sub-command help')
     subparsers.required = True
 
     ## quick
-    qucik_parser = subparsers.add_parser('quick', help='Repeat quantification by quick mode')
+    qucik_parser = subparsers.add_parser('quick', help='Genotyping forensic STR by quick mode')
     qucik_parser.add_argument('--BAM', help='input1: *.bam file', default = None)
     qucik_parser.add_argument('--PAT', help='input2: repeat pattern file', default = None)
     qucik_parser.add_argument('--ID', help='output file name', default = None)
     qucik_parser.set_defaults(func=quick)
 
     ## localalign
-    window_parser = subparsers.add_parser('LA', help='Repeat quantification by local align')
+    window_parser = subparsers.add_parser('LA', help='Genotyping forensic STR by local align')
     window_parser.add_argument('--BAM', help='input1: *.bam file', default = None)
     window_parser.add_argument('--PAT', help='input2: repeat pattern file', default = None)
     window_parser.add_argument('--ID', help='output file name', default = None)
     window_parser.set_defaults(func=LA)
         
-    ## TODO: align
-    # align_parser = subparsers.add_parser('align', help='Repeat quantification by align scoring. Developing')
-    # align_parser.add_argument('--BAM', help='input1: *.bam file', default = None)
-    # align_parser.add_argument('--PAT', help='input2: repeat pattern file', default = None)
-    # align_parser.add_argument('--ID', help='output file name', default = None)
-
     ## run
     args = parser.parse_args()
     args.func(args)

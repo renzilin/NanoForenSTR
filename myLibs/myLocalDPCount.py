@@ -13,22 +13,22 @@ import math
 from myLibs import myLocalDPAlign
 
 
-def func_inference_on_str_locus(chrom, start, end, pattern, bam_file_path):
-    samfile = pysam.AlignmentFile(bam_file_path, 'rb')
-    iters   = samfile.fetch(chrom, start, end, until_eof=False)
-    copy_number_lst = []
-    for rank, line in enumerate(iters):
-        if line.seq == None:
-            print("## the flag of no seq in bam file %s" % line.flag)
-            continue
-        else:
-            read_seq = line.seq
-            repeat_intervals, _ = get_interval(pattern, read_seq)
-            break
+# def func_inference_on_str_locus(chrom, start, end, pattern, bam_file_path, flanking_len):
+#     samfile = pysam.AlignmentFile(bam_file_path, 'rb')
+#     iters   = samfile.fetch(chrom, start - flanking_len, end + flanking_len, until_eof=False)
+#     copy_number_lst = []
+#     for rank, line in enumerate(iters):
+#         if line.seq == None:
+#             print("## the flag of no seq in bam file %s" % line.flag)
+#             continue
+#         else:
+#             read_seq = line.seq
+#             repeat_intervals, _ = get_interval(pattern, read_seq)
+#             break
 
-            dist = [repeat_intervals[i][0] - repeat_intervals[i-1][1] for i in range(1, len(repeat_intervals))]
-            dists.append(dist)
-    return
+#             dist = [repeat_intervals[i][0] - repeat_intervals[i-1][1] for i in range(1, len(repeat_intervals))]
+#             dists.append(dist)
+#     return
     
 
 def func_read_in_pattern_file(pattern_file_path):
@@ -41,12 +41,12 @@ def func_read_in_pattern_file(pattern_file_path):
 
 
 
-def func_reads_covering_str_locus(chrom, start, end, pattern, bam_file_path):
+def func_reads_covering_str_locus(chrom, start, end, bam_file_path, flanking_len):
     
     reads_lst = []
     
     samfile = pysam.AlignmentFile(bam_file_path, 'rb')
-    iters   = samfile.fetch(chrom, start, end, until_eof=False)
+    iters   = samfile.fetch(chrom, start - flanking_len, end + flanking_len, until_eof=False)
     for rank, line in enumerate(iters):
         if line.seq == None:
             print("## the flag with no seq in bam file %s" % line.flag)
