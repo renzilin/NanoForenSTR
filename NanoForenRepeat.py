@@ -65,7 +65,7 @@ def quick(args):
         
         
         ## plot hist
-        fig = myplot.func_save_plot(count_lst, str_name, path2)
+        # fig = myplot.func_save_plot(count_lst, str_name, path2)
         
         
         ## output allele
