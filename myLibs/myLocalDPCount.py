@@ -1,17 +1,10 @@
-import os
 import re
-import pathlib
-
-
-import numpy as np
 import pandas as pd
-
 import pysam
 
 import math
 
-from myLibs import myLocalDPAlign
-
+from .myLocalDPAlign import align
 
 # def func_inference_on_str_locus(chrom, start, end, pattern, bam_file_path, flanking_len):
 #     samfile = pysam.AlignmentFile(bam_file_path, 'rb')
@@ -49,7 +42,7 @@ def func_reads_covering_str_locus(chrom, start, end, bam_file_path, flanking_len
     iters   = samfile.fetch(chrom, start - flanking_len, end + flanking_len, until_eof=False)
     for rank, line in enumerate(iters):
         if line.seq == None:
-            print("## the flag with no seq in bam file %s" % line.flag)
+            # print("## the flag with no seq in bam file %s" % line.flag)
             continue
         
         else:
@@ -62,7 +55,7 @@ def get_interval(pattern, read_seq):
 
     intervals_lst = []
     repeat_lst = []
-
+    start_previous, end_previous = 0, 0
     for inds, repeat_inds in enumerate(re.finditer(pattern, read_seq)):
         start, end = repeat_inds.span()
         if inds == 0:
@@ -158,7 +151,7 @@ def func_repeat_interval(intervals_lst, skip_intervals_lst, read_seq, pattern):
         skip_seq   = read_seq[skip_start : skip_end]
         local_ref  = pattern * math.ceil( len(skip_seq) / len(pattern) )
 
-        align_score, aligned_ref, aligned_seq = myLocalDPAlign.align(local_ref, skip_seq, 0, -5, -5)
+        align_score, aligned_ref, aligned_seq = align(local_ref, skip_seq, 0, -5, -5)
 
         if func_if_aligned_repeat(aligned_ref, aligned_seq, pattern):
             if_connect.append(1)
@@ -216,53 +209,33 @@ def func_get_repeat_allele(read_lst, pattern):
 
 def func_str_genotyper(count_lst, cutoff = .5, coverage = 10):
     
-    if len(count_lst) == 0:
+    total_cov = len(count_lst)
+
+    if total_cov == 0:
         return [0, 0], -1, 0, -1
-    
-    elif len(count_lst) <= coverage and len(count_lst) > 0:
-        infos = {}
-        for i in count_lst:
-            if i not in infos:
-                infos[i] = 1
-            else:
-                infos[i] += 1
-        
+
+    if total_cov <= coverage:
+        infos = 'Coverage < 10'
         return [0, 0], -1, 0, str(infos)
 
+    allele_df = pd.Series(count_lst).value_counts().rename_axis('allele').reset_index(name='Coverage')
+    allele_df['ratio'] = allele_df['Coverage'] / max(allele_df['Coverage'])
+    
+    infos = '::Allele: Coverage, '
 
-    infos = {}
-    for i in count_lst:
-        if i not in infos:
-            infos[i] = 1
-        else:
-            infos[i] += 1
-    
-    total_cov = len(count_lst)
-    count_reads_lst  = []
-    count_number_lst = []
-    
-    for i in count_lst:
-        if i not in count_number_lst:
-            count_number_lst.append(i)
-            count_reads_lst.append(1)
-        else:
-            count_reads_lst[count_number_lst.index(i)] += 1
-    
-    count_df = pd.DataFrame(list( zip( *[count_number_lst, count_reads_lst] ) ), columns=['copy_number', 'reads_support'])
-    count_df['total_cov'] = total_cov
-    count_df['cov_ratio'] = count_df['reads_support'] / count_df['total_cov']
-    count_df['max_ratio'] = count_df['cov_ratio'] / max(count_df['cov_ratio'])
-    count_left_df = count_df.loc[count_df['max_ratio'] >= cutoff, :]
-    
-    if count_left_df.shape[0] == 1:
-        return count_left_df["copy_number"].tolist() * 2, 2.1, total_cov, str(infos)
-    
-    elif count_left_df.shape[0] == 2:
-        return count_left_df["copy_number"].tolist(), 2.2, total_cov, str(infos)
+    for ind, allele in enumerate(allele_df['allele'].values):
+        infos += '%s: %s, ' % ( allele, allele_df['Coverage'][ind] )
 
-    elif count_left_df.shape[0] == 3:
-        temp_df = count_left_df.sort_values(by = 'max_ratio', ascending=False)
-        return temp_df["copy_number"].tolist()[:2], 2.3, total_cov, str(infos)
+
+    allele_df_filter = allele_df.loc[allele_df['ratio'] >= cutoff, :]
+    
+    if allele_df_filter.shape[0] == 1:
+        return  allele_df_filter["allele"].tolist() * 2, 'homo', total_cov, infos
+    
+    elif allele_df_filter.shape[0] == 2:
+        return  allele_df_filter["allele"].tolist(), 'heter', total_cov, infos
+
+    elif allele_df_filter.shape[0] == 3:
+        return allele_df_filter["allele"].tolist()[:2], 'tri-allelic', total_cov, infos
     else:
-        temp_df = count_left_df.sort_values(by = 'max_ratio', ascending=False)
-        return temp_df["copy_number"].tolist()[:1] + [pd.NA], 1, total_cov, str(infos)
+        return allele_df_filter["allele"].tolist()[:1] + [pd.NA], 'only detect 1 allele', total_cov, infos
