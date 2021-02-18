@@ -12,6 +12,7 @@
 
 
 ## 
+import os
 import argparse
 import pathlib
 
@@ -86,9 +87,26 @@ def quick(args):
 ######################  LA Local Align
 def LA(args):
     
+    def fetch_flanking_seq(chrom, start, end, flanking_len, reference_genome, samtools):
+        pre_flanking_coor = "%s:%s-%s" % (chrom, int(start) - flanking_len, int(start)-1)
+        suf_flanking_coor = "%s:%s-%s" % (chrom, int(end) + 1, int(end) + flanking_len)
+
+        # print("## USE samtools to extract the flanking seq;\n## the command: %s faidx %s %s" % (samtools, reference_genome, pre_flanking_coor))
+        faidx_output = os.popen("%s faidx %s %s" % (samtools, reference_genome, pre_flanking_coor)).read()
+        pre_flanking = faidx_output.split('\n')[1]
+
+        # print("## USE samtools to extract the flanking seq;\n## the command: %s faidx %s %s" % (samtools, reference_genome, suf_flanking_coor))
+        faidx_output = os.popen("%s faidx %s %s" % (samtools, reference_genome, suf_flanking_coor)).read()
+        sup_flanking = faidx_output.split('\n')[1]
+        
+        return pre_flanking, sup_flanking
+
+
     bam_file_path = args.BAM
     pattern_file_path = args.PAT
     sample = args.ID
+    reference_genome = args.ref 
+    samtools = args.samtools
     
     ## create dir
     
@@ -116,16 +134,18 @@ def LA(args):
         start   = int(pattern_dict[str_name][1])
         end     = int(pattern_dict[str_name][2])
         pattern = pattern_dict[str_name][3]
-
-        ## reads
-        flanking_len = 30
-        read_lst = func_reads_covering_str_locus(chrom, start, end, bam_file_path, flanking_len)
         
+        
+        ## reads
+        flanking_len = 20
+        seq_prefix, seq_suffix = fetch_flanking_seq(chrom, start, end, flanking_len, reference_genome, samtools)
+        read_lst = func_reads_covering_str_locus(chrom, start, end, bam_file_path, flanking_len, seq_prefix, seq_suffix)
+
         ## copy number list
         copy_number_lst = func_get_repeat_allele(read_lst, pattern)
         
         ## Get genotype
-        genotype, valid_alleles_num, total_cov, infos = func_str_genotyper(copy_number_lst)
+        genotype, valid_alleles_num, total_cov, infos = func_str_genotyper(copy_number_lst, .56)
         
         ## plot hist
         # fig = myplot.func_save_plot(copy_number_lst, str_name, path2)
@@ -167,6 +187,8 @@ Available options are:
     window_parser.add_argument('--BAM', help='input1: *.bam file', default = None)
     window_parser.add_argument('--PAT', help='input2: repeat pattern file', default = None)
     window_parser.add_argument('--ID', help='output file name', default = None)
+    window_parser.add_argument('--ref', help='reference genome', default = None)
+    window_parser.add_argument('--samtools', help='samtools', default = None)
     window_parser.set_defaults(func=LA)
         
     ## run
