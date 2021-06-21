@@ -40,7 +40,7 @@ python setup_myDPAlign.py build_ext --inplace
 git clone https://github.com/renzilin/NanoForenSTR.git
 cd NanoForenSTR/test
 
-python ../NanoForenRepeat.py LA --BAM bam_file/barcode01.test.bam --PAT pattern_file/STRtest.pat --ID test --ref hg19.fa --samtools samtools
+python ../nanoforenstr.py LA --BAM bam_file/barcode01.test.bam --PAT pattern_file/STRtest.pat --ID test --ref ../myRef/hg19_goldenPath/hg19.fa --samtools samtools
 ```
 
 
@@ -63,7 +63,7 @@ SAMPLE_NAME="[SAMPLE_NAME]"
 REF="[PATH_TO_REFERENCE_GENOME]"
 SAMTOOLS="[PATH_TO_SAMTOOLS]"
 
-python $NanoForenSTR/NanoForenSTR.py LA \
+python $NanoForenSTR/nanoforenstr.py LA \
 --BAM $BAM_FILE \
 --PAT $NanoForenSTR/test/pattern_file/STR.pat \
 --ID  $SAMPLE_NAME
