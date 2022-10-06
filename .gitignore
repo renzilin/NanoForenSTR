@@ -14,3 +14,12 @@ pre-bulid/*
 !test/bam_file/barcode01.test.bam.bai
 !test/forenRepeat_output_LA/test/forenRep.csv
 *.ipynb
+
+myRef/*
+!myRef/readme.md
+
+myLibs/__pycache__
+myLibs/build
+myLibs/temp
+*.c
+*.so

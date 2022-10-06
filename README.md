@@ -20,16 +20,11 @@ We recommend to use  `conda` to build NanoForenSTR environment and run our scrip
 
 ```bash
 ## create a conda environment
-conda create -n NFS-v0.0.1
-conda activate NFS-v0.0.1
+conda create -n nanoforenstr python=3.8
+conda activate nanoforenstr
 
 ## install dependent packages
-conda install -c conda-forge -c bioconda  python=3.8 pysam=0.16 numpy=1.19 pandas=1.1.3 cython=0.29 tqdm
-
-cd myLibs
-
-python setup_myDPAlign.py build_ext --inplace
-
+conda install -c conda-forge -c bioconda pysam=0.16 numpy=1.19 pandas=1.1.3 cython=0.29 tqdm samtools=1.6 -y
 ```
 
 
@@ -38,9 +33,14 @@ python setup_myDPAlign.py build_ext --inplace
 
 ```bash
 git clone https://github.com/renzilin/NanoForenSTR.git
-cd NanoForenSTR/test
 
-python ../nanoforenstr.py LA --BAM bam_file/barcode01.test.bam --PAT pattern_file/STRtest.pat --ID test --ref ../myRef/hg19_goldenPath/hg19.fa --samtools samtools
+
+cd myLibs
+python setup_myDPAlign.py build_ext --inplace
+python setup_myPairwiseAlignment.py build_ext --inplace
+
+cd NanoForenSTR/test
+python ../nanoforenstr.py LA --BAM bam_file/barcode01.test.bam --PAT pattern_file/STRtest.pat --ID test --ref ../myRef/hg19/hg19.fa --samtools samtools
 ```
 
 
